@@ -1,59 +1,113 @@
-﻿using Core.Model;
+﻿using API.DTO;
+using AutoMapper;
+using Core.Interfaces;
+using Core.Model;
 using Core.Model.DTO;
-using Infraestructura.Datos;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection.Metadata.Ecma335;
 
 namespace API.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class PaisController : ControllerBase {
-        private readonly ApplicationDbContext _db;
-        protected ResponseDTO _response;
+        private readonly IRepositorio<Pais> repoPais;
+        public IMapper mapper;
+        protected ResponseDTO response;
 
-        public PaisController(ApplicationDbContext db) {
-            _db = db;
-            _response = new ResponseDTO();
+        public PaisController(IRepositorio<Pais> repoPais, IMapper mapper) {
+            response = new ResponseDTO();
+            this.repoPais = repoPais;
+            this.mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Pais>>> getPaises() {
-            List<Pais> paises = new();
+        public async Task<ActionResult<List<PaisDTO>>> obtenerPaises() {
+            IReadOnlyCollection<Pais> paises;
             int code;
             try {
-                paises = await _db.Pais.ToListAsync();
-                _response.success = true;
-                _response.displayMessage = paises.Count == 0 ? "No se encontraron paises" : "Lista de Paises ("+ paises.Count + ")";
-                _response.result = paises;
+                paises = await repoPais.obtenerTodosAsync();
+                response.success = true;
+                response.displayMessage = paises.Count == 0 ? "No se encontraron paises" : "Lista de Paises (" + paises.Count + ")";
+                response.result = mapper.Map<IReadOnlyCollection<Pais>, IReadOnlyCollection<PaisDTO>>(paises);
                 code = paises.Count == 0 ? 404 : 200;
             } catch (Exception ex) {
-                _response.success = false;
-                _response.displayMessage = "Error con el servidor";
-                _response.errorMessage = new List<string> { ex.ToString() };
+                response.success = false;
+                response.displayMessage = "Error con el servidor";
+                response.errorMessage = new List<string> { ex.ToString() };
                 code = 500;
             }
-            return StatusCode(code,_response);
+            return StatusCode(code, response);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Pais>> obtenerPaises(int id) {
+        public async Task<ActionResult<PaisDTO>> obtenerPaises(int id) {
             Pais pais = new();
             int code;
             try {
-                pais = await _db.Pais.FindAsync(id);
-                _response.success = true;
-                _response.displayMessage = pais == null ? "No se encontraron paises" : "Paises (" + pais.nombre + ")";
-                _response.result = pais;
+                pais = await repoPais.obtenerPorIdAsync(id);
+                response.success = true;
+                response.displayMessage = pais == null ? "No se encontro el país buscado" : "País buscado (" + pais.nombre + ")";
+                response.result = mapper.Map<Pais, PaisDTO>(pais);
                 code = pais == null ? 404 : 200;
             } catch (Exception ex) {
-                _response.success = false;
-                _response.displayMessage = "Error con el servidor";
-                _response.errorMessage = new List<string> { ex.ToString() };
+                response.success = false;
+                response.displayMessage = "Error con el servidor";
+                response.errorMessage = new List<string> { ex.ToString() };
                 code = 500;
             }
-            return StatusCode(code, _response);
+            return StatusCode(code, response);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Pais>> crearPais(Pais pais) {
+            int code;
+            try {
+                pais = await repoPais.crearAsync(pais);
+                response.success = true;
+                response.displayMessage = "País creado correctamente";
+                response.result = pais;
+                code = 200;
+            } catch (Exception ex) {
+                response.success = false;
+                response.displayMessage = "Error con el servidor";
+                response.errorMessage = new List<string> { ex.ToString() };
+                code = 500;
+            }
+            return StatusCode(code, response);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<Pais>> actualizarPais(Pais pais) {
+            int code;
+            try {
+                pais = await repoPais.actualizarAsync(pais);
+                response.success = true;
+                response.displayMessage = "País actualizado correctamente";
+                response.result = pais;
+                code = 200;
+            } catch (Exception ex) {
+                response.success = false;
+                response.displayMessage = "Error con el servidor";
+                response.errorMessage = new List<string> { ex.ToString() };
+                code = 304;
+            }
+            return StatusCode(code, response);
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult<bool>> eliminarPais(int id) {
+            int code;
+            try {
+                bool paisEliminado = await repoPais.eliminarPorIdAsync(id);
+                response.success = paisEliminado;
+                response.displayMessage = paisEliminado ? "País eliminado correctamente" : "No se pudo eliminar el País";
+                code = 301;
+            } catch (Exception ex) {
+                response.success = false;
+                response.displayMessage = "Error con el servidor";
+                response.errorMessage = new List<string> { ex.ToString() };
+                code = 500;
+            }
+            return StatusCode(code, response);
         }
     }
 }
