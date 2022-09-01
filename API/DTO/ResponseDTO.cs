@@ -1,4 +1,4 @@
-﻿namespace Core.Model.DTO {
+﻿namespace API.DTO {
     public class ResponseDTO {
         public bool success { get; set; }
         public object result { get; set; }

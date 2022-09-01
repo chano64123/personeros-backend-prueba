@@ -1,11 +1,10 @@
 ﻿using Core.Interfaces;
-using Core.Model.DTO;
+using API.DTO;
 using Core.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Core.Especificacion;
 using AutoMapper;
-using API.DTO;
 
 namespace API.Controllers {
     [Route("api/[controller]")]
@@ -67,7 +66,8 @@ namespace API.Controllers {
             try {
                 departamento = await repoDepartamento.crearAsync(departamento);
                 var especificacion = new DepartamentoConPaisEspecificacion(departamento.idDepartamento);
-                response.result = await repoDepartamento.obtenerPorIdEspecificoAsync(especificacion);
+                departamento = await repoDepartamento.obtenerPorIdEspecificoAsync(especificacion);
+                response.result = mapper.Map<Departamento, DepartamentoDTO>(departamento);
                 response.displayMessage = "Departamento creado correctamente";
                 response.success = true;
                 code = 200;
@@ -86,7 +86,8 @@ namespace API.Controllers {
             try {
                 departamento = await repoDepartamento.actualizarAsync(departamento);
                 var especificacion = new DepartamentoConPaisEspecificacion(departamento.idDepartamento);
-                response.result = await repoDepartamento.obtenerPorIdEspecificoAsync(especificacion);
+                departamento = await repoDepartamento.obtenerPorIdEspecificoAsync(especificacion);
+                response.result = mapper.Map<Departamento, DepartamentoDTO>(departamento);
                 response.success = true;
                 response.displayMessage = "Departamento actualizado correctamente";
                 code = 200;
@@ -106,7 +107,7 @@ namespace API.Controllers {
                 bool departamentoEliminado = await repoDepartamento.eliminarPorIdAsync(id);
                 response.success = departamentoEliminado;
                 response.displayMessage = departamentoEliminado ? "Departamento eliminado correctamente" : "No se pudo eliminar el Departamento";
-                code = 301;
+                code = departamentoEliminado ? 301 : 400;
             } catch (Exception ex) {
                 response.success = false;
                 response.displayMessage = "Error con el servidor";

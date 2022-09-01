@@ -8,6 +8,10 @@ namespace API.Helpers {
             CreateMap<Pais, PaisDTO>();
             CreateMap<Departamento, DepartamentoDTO>();
             CreateMap<Provincia, ProvinciaDTO>();
+            CreateMap<Distrito, DistritoDTO>();
+            CreateMap<TipoUsuario, TipoUsuarioDTO>();
+            CreateMap<ProcesoElectoral, ProcesoElectoralDTO>();
+            CreateMap<PartidoPolitico, PartidoPoliticoDTO>();
         }
     }
 }

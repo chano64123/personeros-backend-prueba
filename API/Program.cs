@@ -34,13 +34,9 @@ builder.Services.AddScoped<IDepartamentoRepositorio, DepartamentoRepositorio>();
 builder.Services.AddScoped<IDistritoRepositorio, DistritoRepositorio>();
 builder.Services.AddScoped<IInstitucionRepositorio, InstitucionRepositorio>();
 builder.Services.AddScoped<IMesaRepositorio, MesaRepositorio>();
-builder.Services.AddScoped<IPaisRepositorio, PaisRepositorio>();
-builder.Services.AddScoped<IPartidoPoliticoRepositorio, PartidoPoliticoRepositorio>();
 builder.Services.AddScoped<IPersonaRepositorio, PersonaRepositorio>();
 builder.Services.AddScoped<IPersoneroRepositorio, PersoneroRepositorio>();
-builder.Services.AddScoped<IProcesoElectoralRepositorio, ProcesoElectoralRepositorio>();
 builder.Services.AddScoped<IProvinciaRepositorio, ProvinciaRepositorio>();
-builder.Services.AddScoped<ITipoUsuarioRepositorio, TipoUsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped(typeof(IRepositorio<>), typeof(Repositorio<>));
 

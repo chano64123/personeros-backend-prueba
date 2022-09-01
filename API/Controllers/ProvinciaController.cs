@@ -1,5 +1,4 @@
 ﻿using Core.Interfaces;
-using Core.Model.DTO;
 using Core.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -62,13 +61,15 @@ namespace API.Controllers {
         }
 
         [HttpPost]
-        public async Task<ActionResult<Provincia>> crearProvincia(Provincia provincia) {
+        public async Task<ActionResult<ProvinciaDTO>> crearProvincia(Provincia provincia) {
             int code;
             try {
                 provincia = await repoProvincia.crearAsync(provincia);
+                var especificacion = new ProvinciaConDepartamentoPaisEspecificacion(provincia.idDepartamento);
+                provincia = await repoProvincia.obtenerPorIdEspecificoAsync(especificacion);
+                response.result = mapper.Map<Provincia, ProvinciaDTO>(provincia);
                 response.success = true;
                 response.displayMessage = "Provincia creada correctamente";
-                response.result = provincia;
                 code = 200;
             } catch (Exception ex) {
                 response.success = false;
@@ -80,13 +81,15 @@ namespace API.Controllers {
         }
 
         [HttpPut]
-        public async Task<ActionResult<Provincia>> actualizarProvincia(Provincia provincia) {
+        public async Task<ActionResult<ProvinciaDTO>> actualizarProvincia(Provincia provincia) {
             int code;
             try {
                 provincia = await repoProvincia.actualizarAsync(provincia);
+                var especificacion = new ProvinciaConDepartamentoPaisEspecificacion(provincia.idDepartamento);
+                provincia = await repoProvincia.obtenerPorIdEspecificoAsync(especificacion);
+                response.result = mapper.Map<Provincia, ProvinciaDTO>(provincia);
                 response.success = true;
                 response.displayMessage = "Provincia actualizada correctamente";
-                response.result = provincia;
                 code = 200;
             } catch (Exception ex) {
                 response.success = false;
@@ -101,10 +104,10 @@ namespace API.Controllers {
         public async Task<ActionResult<bool>> eliminarProvincia(int id) {
             int code;
             try {
-                bool departamentoEliminado = await repoProvincia.eliminarPorIdAsync(id);
-                response.success = departamentoEliminado;
-                response.displayMessage = departamentoEliminado ? "Provincia eliminado correctamente" : "No se pudo eliminar la Provincia";
-                code = 301;
+                bool provinciaEliminado = await repoProvincia.eliminarPorIdAsync(id);
+                response.success = provinciaEliminado;
+                response.displayMessage = provinciaEliminado ? "Provincia eliminada correctamente" : "No se pudo eliminar la Provincia";
+                code = provinciaEliminado ? 301 : 400;
             } catch (Exception ex) {
                 response.success = false;
                 response.displayMessage = "Error con el servidor";

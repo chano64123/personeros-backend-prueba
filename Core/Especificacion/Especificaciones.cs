@@ -26,4 +26,14 @@ namespace Core.Especificacion {
             AgregarInclude(x => x.departamento.pais);
         }
     }
+
+    public class DistritoConProvinciaDepartamentoPaisEspecificacion : EspecificacionBase<Distrito> {
+        public DistritoConProvinciaDepartamentoPaisEspecificacion() {
+            AgregarInclude(x => x.provincia.departamento.pais);
+        }
+
+        public DistritoConProvinciaDepartamentoPaisEspecificacion(int id) : base(x => x.idDistrito == id) {
+            AgregarInclude(x => x.provincia.departamento.pais);
+        }
+    }
 }

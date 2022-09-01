@@ -2,7 +2,6 @@
 using AutoMapper;
 using Core.Interfaces;
 using Core.Model;
-using Core.Model.DTO;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers {
@@ -39,7 +38,7 @@ namespace API.Controllers {
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PaisDTO>> obtenerPaises(int id) {
+        public async Task<ActionResult<PaisDTO>> obtenerPais(int id) {
             Pais pais = new();
             int code;
             try {
@@ -58,13 +57,13 @@ namespace API.Controllers {
         }
 
         [HttpPost]
-        public async Task<ActionResult<Pais>> crearPais(Pais pais) {
+        public async Task<ActionResult<PaisDTO>> crearPais(Pais pais) {
             int code;
             try {
                 pais = await repoPais.crearAsync(pais);
                 response.success = true;
                 response.displayMessage = "País creado correctamente";
-                response.result = pais;
+                response.result = mapper.Map<Pais, PaisDTO>(pais);
                 code = 200;
             } catch (Exception ex) {
                 response.success = false;
@@ -76,13 +75,13 @@ namespace API.Controllers {
         }
 
         [HttpPut]
-        public async Task<ActionResult<Pais>> actualizarPais(Pais pais) {
+        public async Task<ActionResult<PaisDTO>> actualizarPais(Pais pais) {
             int code;
             try {
                 pais = await repoPais.actualizarAsync(pais);
                 response.success = true;
                 response.displayMessage = "País actualizado correctamente";
-                response.result = pais;
+                response.result = mapper.Map<Pais, PaisDTO>(pais);
                 code = 200;
             } catch (Exception ex) {
                 response.success = false;
@@ -100,7 +99,7 @@ namespace API.Controllers {
                 bool paisEliminado = await repoPais.eliminarPorIdAsync(id);
                 response.success = paisEliminado;
                 response.displayMessage = paisEliminado ? "País eliminado correctamente" : "No se pudo eliminar el País";
-                code = 301;
+                code = paisEliminado ? 301 : 400;
             } catch (Exception ex) {
                 response.success = false;
                 response.displayMessage = "Error con el servidor";
